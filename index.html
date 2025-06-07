@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -131,6 +131,193 @@
       .then(data => {
         allData = data;
         renderCategories(allData);
+        renderCards();
+      });
+  </script>
+</body>
+</html>
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão do Conhecimento</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      background-color: #121212;
+      color: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      background: #1f1f1f;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    .menu-button {
+      background: none;
+      border: none;
+      color: #f5f5f5;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 2rem;
+      top: 4rem;
+      background-color: #1f1f1f;
+      border: 1px solid #333;
+      border-radius: 5px;
+      overflow: hidden;
+      z-index: 100;
+    }
+    .dropdown button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      width: 100%;
+      border: none;
+      background: none;
+      color: #f5f5f5;
+      text-align: left;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .dropdown button:hover {
+      background-color: #2e2e2e;
+    }
+    .search {
+      padding: 1rem 2rem;
+    }
+    .search input {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: none;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      padding: 2rem;
+    }
+    .card {
+      background: #1e1e1e;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .tag {
+      background: #333;
+      color: #fff;
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      margin-top: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gestão do Conhecimento</h1>
+    <button class="menu-button" onclick="toggleDropdown()"><i data-lucide="menu"></i></button>
+    <div class="dropdown" id="dropdown-menu"></div>
+  </header>
+  <div class="search">
+    <input type="text" id="search" placeholder="Pesquisar título, conteúdo ou categoria..." />
+  </div>
+  <section class="cards" id="cards-container"></section>
+
+  <script>
+    lucide.createIcons();
+
+    const apiUrl = 'https://sgic-backend.onrender.com/temas';
+    const container = document.getElementById('cards-container');
+    const dropdown = document.getElementById('dropdown-menu');
+    const searchInput = document.getElementById('search');
+
+    let allData = [];
+    let currentCategory = 'Todos';
+
+    const iconesPorCategoria = {
+      'Fundamentos': 'book-open',
+      'Tipos de Conhecimento': 'layers',
+      'Escolas de GC': 'school',
+      'Modelo SECI': 'repeat',
+      'Aplicações': 'layout',
+      'TI e GC': 'cpu',
+      'Ferramentas de GC': 'tool',
+      'Desafios': 'alert-triangle',
+      'Integração': 'shuffle',
+      'Modelos de GC': 'folder-tree',
+      'Fatores Críticos': 'alert-octagon',
+      'Medição': 'bar-chart',
+      'Implantação': 'play-circle'
+    };
+
+    function toggleDropdown() {
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function renderDropdown(data) {
+      const categorias = ['Todos', ...new Set(data.map(t => t.categoria))];
+      dropdown.innerHTML = categorias.map(cat => {
+        const icon = iconesPorCategoria[cat] || 'tag';
+        return `<button data-cat="${cat}"><i data-lucide="${icon}"></i> ${cat}</button>`;
+      }).join('');
+      lucide.createIcons();
+
+      dropdown.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentCategory = btn.dataset.cat;
+          dropdown.style.display = 'none';
+          renderCards();
+        });
+      });
+    }
+
+    function renderCards() {
+      const searchText = searchInput.value.toLowerCase();
+      const filtered = allData.filter(t => {
+        return (currentCategory === 'Todos' || t.categoria === currentCategory) &&
+          (t.titulo.toLowerCase().includes(searchText) ||
+           t.conteudo.toLowerCase().includes(searchText) ||
+           t.categoria.toLowerCase().includes(searchText));
+      });
+      container.innerHTML = filtered.map(t => `
+        <div class="card">
+          <h2>${t.titulo}</h2>
+          <p>${t.conteudo}</p>
+          <span class="tag">${t.categoria}</span>
+        </div>`).join('');
+    }
+
+    searchInput.addEventListener('input', renderCards);
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        allData = data;
+        renderDropdown(allData);
         renderCards();
       });
   </script>

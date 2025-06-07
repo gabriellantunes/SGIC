@@ -43,7 +43,6 @@
       border-radius: 5px;
       overflow: hidden;
       z-index: 100;
-      min-width: 200px;
     }
     .dropdown button {
       display: flex;
@@ -101,7 +100,7 @@
 <body>
   <header>
     <h1>Gestão do Conhecimento</h1>
-    <button class="menu-button" onclick="toggleDropdown()"><i data-lucide="menu"></i></button>
+    <button class="menu-button" onclick="toggleDropdown(event)"><i data-lucide="menu"></i></button>
     <div class="dropdown" id="dropdown-menu"></div>
   </header>
   <div class="search">
@@ -127,7 +126,7 @@
       'Modelo SECI': 'repeat',
       'Aplicações': 'layout',
       'TI e GC': 'cpu',
-      'Ferramentas de GC': 'settings',
+      'Ferramentas de GC': 'tool',
       'Desafios': 'alert-triangle',
       'Integração': 'shuffle',
       'Modelos de GC': 'folder-tree',
@@ -136,8 +135,13 @@
       'Implantação': 'play-circle'
     };
 
-    function toggleDropdown() {
+    function toggleDropdown(event) {
+      event.stopPropagation();
       dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function closeDropdown() {
+      dropdown.style.display = 'none';
     }
 
     function renderDropdown(data) {
@@ -151,7 +155,7 @@
       dropdown.querySelectorAll('button').forEach(btn => {
         btn.addEventListener('click', () => {
           currentCategory = btn.dataset.cat;
-          dropdown.style.display = 'none';
+          closeDropdown();
           renderCards();
         });
       });
@@ -174,6 +178,7 @@
     }
 
     searchInput.addEventListener('input', renderCards);
+    document.addEventListener('click', closeDropdown);
 
     fetch(apiUrl)
       .then(res => res.json())

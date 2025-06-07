@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestão do Conhecimento</title>
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/gabriellantunes/SGIC/main/favicon.png">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     body {
@@ -100,7 +101,7 @@
 </head>
 <body>
   <header>
-    <h1 onclick="setToAll()">Gestão do Conhecimento</h1>
+    <h1 onclick="handleTitleClick()">Gestão do Conhecimento</h1>
     <button class="menu-button" onclick="toggleDropdown(event)"><i data-lucide="menu"></i></button>
     <div class="dropdown" id="dropdown-menu"></div>
   </header>
@@ -145,7 +146,7 @@
       dropdown.style.display = 'none';
     }
 
-    function setToAll() {
+    function handleTitleClick() {
       currentCategory = 'Todos';
       renderCards();
     }
@@ -184,7 +185,11 @@
     }
 
     searchInput.addEventListener('input', renderCards);
-    document.addEventListener('click', closeDropdown);
+    document.addEventListener('click', (event) => {
+      if (!dropdown.contains(event.target) && !event.target.closest('.menu-button')) {
+        closeDropdown();
+      }
+    });
 
     fetch(apiUrl)
       .then(res => res.json())

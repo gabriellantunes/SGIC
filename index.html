@@ -25,6 +25,7 @@
     header h1 {
       margin: 0;
       font-size: 1.5rem;
+      cursor: pointer;
     }
     .menu-button {
       background: none;
@@ -99,7 +100,7 @@
 </head>
 <body>
   <header>
-    <h1>Gestão do Conhecimento</h1>
+    <h1 onclick="setToAll()">Gestão do Conhecimento</h1>
     <button class="menu-button" onclick="toggleDropdown(event)"><i data-lucide="menu"></i></button>
     <div class="dropdown" id="dropdown-menu"></div>
   </header>
@@ -142,6 +143,11 @@
 
     function closeDropdown() {
       dropdown.style.display = 'none';
+    }
+
+    function setToAll() {
+      currentCategory = 'Todos';
+      renderCards();
     }
 
     function renderDropdown(data) {
